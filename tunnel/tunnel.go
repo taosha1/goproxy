@@ -12,7 +12,7 @@ func (t *Tunnel) Read(p []byte) (int,error) {
 		return 0, err
 	}
 	return copy(p,data),nil
-	//error
+	//bug：
 	//copy(p, data)
 	//return len(p), nil
 }

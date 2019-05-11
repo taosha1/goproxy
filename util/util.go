@@ -28,10 +28,6 @@ func IsDomain(host string) bool {
 	return match
 }
 
-// IsIPv6 detect if ip is ipv6.
-
-// IsIPv4 detect if ip is ipv4.
-
 // findIP returns the first ip matched detector.
 func findIP(ips []net.IP, f func(ip net.IP) bool) net.IP {
 	for _, ip := range ips {

@@ -9,6 +9,7 @@ import (
 )
 
 //解析socks5协议
+
 type Target struct {
 	//从socks5通信中获取的被转发（代理）的信息
 	Host string
@@ -48,8 +49,8 @@ func ListenAndServe(localAddr string, f func(conn net.Conn, target *Target)) {
 		}
 		go handleSocks5(conn, f)
 	}
-
 }
+
 func handleSocks5(conn net.Conn, f func(conn net.Conn, target *Target)) {
 	target, err := socks5Handshake(conn)
 	//握手失败
@@ -75,6 +76,7 @@ func socks5Handshake(conn net.Conn) (*Target, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	// get target info.
 	n, err = conn.Read(bytes)
 	if err != nil {
@@ -84,6 +86,7 @@ func socks5Handshake(conn net.Conn) (*Target, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	//跳过前三个字节，转换
 	return parseTargetInfo(bytes[3:n])
 }

@@ -10,13 +10,13 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type Config struct {
 	// host:port
 	LocalAddr  string
 	RemoteAddr string
-
 	//Secure bool
 	//Ipv6   bool
 	//Host string
@@ -24,15 +24,12 @@ type Config struct {
 
 type Client struct {
 	config *Config
-
 	//remote host port
 	host string
 	port string
 	//schema + remoteAddr
 	wsAddr string
-
 	header http.Header
-
 	dialer websocket.Dialer
 }
 
@@ -43,7 +40,7 @@ func New(config *Config) *Client {
 		ReadBufferSize:   1024,
 		WriteBufferSize:  1024,
 		WriteBufferPool:  new(sync.Pool),
-		//HandshakeTimeout: time.Second * 10,
+		HandshakeTimeout: time.Second * 10,
 	}
 	client.completeHostAndPort()
 	client.completeWSAddr()
@@ -59,16 +56,15 @@ func (client *Client) CreateTunnel(targethost, targetport string) (io.ReadWriteC
 	url := client.wsAddr + "/free?h=" + util.Encode(targethost) + "&p=" + util.Encode(targetport)
 	conn, _, err := client.dialer.Dial(url, client.header)
 	if err != nil {
-		log.Println("conn fail")
+		//log.Println("conn fail")
 		return nil, err
 	}
-	log.Println("conn success")
+	//log.Println("conn success")
 	t := &tunnel.Tunnel{*conn}
 	return t, nil
 }
 
 // create a local socks5 server.
-// broswer - socks5 server | local - remote
 // 解析浏览器转发的socks5报文，对每次请求都打通一个隧道
 func (client *Client) ListenAndServe() {
 	log.Println("server:", client.wsAddr)
@@ -80,12 +76,10 @@ func (client *Client) ListenAndServe() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-
 		//请求转发
 		go io.Copy(t,conn)
 		//响应转发
 		go io.Copy(conn,t)
-
 	}
 	socks5.ListenAndServe(client.config.LocalAddr, handleConn)
 }
@@ -116,7 +110,6 @@ func (client *Client) completeWSAddr() {
 		return
 	}
 	client.wsAddr = schema + ip.String() + ":" + client.port
-
 }
 
 // 设置dialer的secure init tls setting.

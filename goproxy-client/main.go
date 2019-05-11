@@ -6,7 +6,6 @@ import (
 )
 
 func main() {
-
 	var (
 		LocalAddr  string
 		RemoteAddr string
@@ -25,5 +24,4 @@ func main() {
 		//Ipv6:Ipv6,
 	}
 	client.New(&cfg).ListenAndServe()
-
 }
