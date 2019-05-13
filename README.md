@@ -35,4 +35,13 @@ Upgrade: websocket
 Sec-WebSocket-Accept: Oy4NRAQ13jhfONC7bP8dTKb4PTU=
 ```
 > 备注：每个header都以\r\n结尾，并且最后一行加上一个额外的空行\r\n。此外，服务端回应的HTTP状态码只能在握手阶段使用。过了握手阶段后，就只能采用特定的错误码。
+## Usage
+```
+build:
+go build -o client.exe goproxy-client/main.go
+go build -o server.exe goproxy-server/main.go
+help:
+./client.exe -h
+./server.exe -h
+```
 
