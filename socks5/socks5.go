@@ -2,7 +2,6 @@ package socks5
 
 import (
 	"errors"
-	"github.com/taosha1/goproxy/util"
 	"log"
 	"net"
 	"strconv"
@@ -39,7 +38,7 @@ var (
 func ListenAndServe(localAddr string, f func(conn net.Conn, target *Target)) {
 	listener, err := net.Listen("tcp", localAddr)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Socks5 server start fail")
 	}
 	log.Println("Socks5 server listening at", localAddr)
 	for {
@@ -56,10 +55,10 @@ func handleSocks5(conn net.Conn, f func(conn net.Conn, target *Target)) {
 	//握手失败
 	if err != nil {
 		conn.Close()
-		log.Fatalln(err)
+		log.Println("Socks5 handshake error:", err)
+		return
 	}
-	//数据转发
-	//客户端在收到来自服务器成功的响应后，就会开始发送数据了，服务端在收到来自客户端的数据后，会转发到目标服务。
+	//数据转发,客户端在收到来自服务器成功的响应后，就会开始发送数据了，服务端在收到来自客户端的数据后，会转发到目标服务。
 	go f(conn, target)
 }
 
@@ -92,32 +91,34 @@ func socks5Handshake(conn net.Conn) (*Target, error) {
 }
 
 func parseTargetInfo(buf []byte) (*Target, error) {
+	errInvalid := errors.New("Invalid target info")
 	target := &Target{}
 	var len = len(buf)
 	target.Port = strconv.Itoa(int(buf[len-2])<<8 | int(buf[len-1]))
 	switch buf[0] {
 	case ipv4:
 		if len != 7 {
-			return nil, errors.New("Invalid target info")
+			return nil, errInvalid
 		}
 		target.Host = net.IP(buf[1:5]).String()
 	case domain:
 		domainlength := int(buf[1])
 		if len-domainlength != 4 {
-			return nil, errors.New("Invalid target info")
+			return nil, errInvalid
 		}
-		if host := string(buf[2:domainlength+2]); !util.IsDomain(host) {
-			return nil, errors.New("Invalid target info")
-		} else {
-			target.Host = host
-		}
+		target.Host = string(buf[2 : domainlength+2])
+		//if host := string(buf[2 : domainlength+2]); !util.IsDomain(host) {
+		//	return nil, errInvalid
+		//} else {
+		//	target.Host = host
+		//}
 	case ipv6:
 		if len != 19 {
-			return nil, errors.New("Invalid target info")
+			return nil, errInvalid
 		}
 		target.Host = net.IP(buf[1:17]).String()
 	default:
-		return nil, errors.New("Invalid target type")
+		return nil, errInvalid
 	}
 	//log.Println(target)
 	return target, nil

@@ -25,6 +25,7 @@ func ListenAndServe(port string) {
 	http.HandleFunc("/free", func(responseWriter http.ResponseWriter, request *http.Request) {
 		addr, err := getTarget(request)
 		if err != nil {
+			http.NotFound(responseWriter, request)
 			return
 		}
 		channle := make(chan net.Conn, 1)
@@ -32,7 +33,7 @@ func ListenAndServe(port string) {
 
 		wsconn, err := upgrader.Upgrade(responseWriter, request, nil)
 		if err != nil {
-			log.Println("upgrade websocket fail")
+			log.Println("websocket Upgrade fail")
 			return
 		}
 
@@ -44,9 +45,7 @@ func ListenAndServe(port string) {
 			return
 		}
 
-		//请求转发
 		go io.Copy(google, tunnel)
-		//响应转发
 		go io.Copy(tunnel, google)
 	})
 	log.Fatalln(http.ListenAndServe(":"+port, nil))
@@ -69,7 +68,7 @@ func getTarget(r *http.Request) (string, error) {
 	host := util.Decode(map1.Get("h"))
 	port := util.Decode(map1.Get("p"))
 	if host == "" || port == "" {
-		return "", errors.New("parameter nil")
+		return "", errors.New("parameters error")
 	}
 	addr := net.JoinHostPort(host, port)
 	return addr, nil

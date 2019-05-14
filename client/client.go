@@ -56,7 +56,7 @@ func (client *Client) CreateTunnel(targethost, targetport string) (io.ReadWriteC
 	url := client.wsAddr + "/free?h=" + util.Encode(targethost) + "&p=" + util.Encode(targetport)
 	conn, _, err := client.dialer.Dial(url, client.header)
 	if err != nil {
-		//log.Println("conn fail")
+		log.Println("CreateTunnel fail")
 		return nil, err
 	}
 	//log.Println("conn success")
@@ -65,36 +65,30 @@ func (client *Client) CreateTunnel(targethost, targetport string) (io.ReadWriteC
 }
 
 // create a local socks5 server.
-// 解析浏览器转发的socks5报文，对每次请求都打通一个隧道
 func (client *Client) ListenAndServe() {
 	log.Println("server:", client.wsAddr)
 	//形参的conn 是socks5的隧道
 	handleConn := func(conn net.Conn, target *socks5.Target) {
-		log.Println("client f()")
-		//t是local - remote之间的隧道
+		//log.Println("handleConn ...")
 		t, err := client.CreateTunnel(target.Host, target.Port)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
-		//请求转发
 		go io.Copy(t,conn)
-		//响应转发
 		go io.Copy(conn,t)
 	}
 	socks5.ListenAndServe(client.config.LocalAddr, handleConn)
 }
 
-// 根据config 截取host和port
 func (client *Client) completeHostAndPort() {
 	host, port, err := net.SplitHostPort(client.config.RemoteAddr)
 	if err != nil {
-		log.Fatal("error remote address")
+		log.Println("error remote address")
 	}
 	client.host = host
 	client.port = port
 }
 
-// 根据host 是否为域名 拼接为websocket地址
 func (client *Client) completeWSAddr() {
 	var schema string = "ws://"
 	// ip
@@ -106,10 +100,16 @@ func (client *Client) completeWSAddr() {
 	log.Println("lookup for server")
 	ip, err := util.Lookup(client.host)
 	if err != nil {
-		log.Fatalln("error lookup ip")
+		log.Println("error lookup ip")
 		return
 	}
 	client.wsAddr = schema + ip.String() + ":" + client.port
+}
+
+func (client *Client) completeHeader() {
+	header := http.Header{}
+	header.Add("host", "www.bilibili.com")
+	client.header = header
 }
 
 // 设置dialer的secure init tls setting.
@@ -122,10 +122,3 @@ func (client *Client) completeWSAddr() {
 //	}
 //	client.dialer.TLSClientConfig = cfg
 //}
-
-//设置请求头
-func (client *Client) completeHeader() {
-	header := http.Header{}
-	header.Add("host", "www.bilibili.com")
-	client.header = header
-}

@@ -42,7 +42,7 @@ func findIP(ips []net.IP, f func(ip net.IP) bool) net.IP {
 func Lookup(host string) (net.IP, error) {
 	addrs, err := net.LookupIP(host)
 	if err != nil {
-		log.Fatalln("error LookupHost")
+		log.Println("error LookupHost")
 	}
 	ip := findIP(addrs, func(ip net.IP) bool {
 		if ip != nil && ip.To4() != nil {
