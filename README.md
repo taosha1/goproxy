@@ -1,5 +1,5 @@
 # goproxy
-基于sockes转发http请求，并使用websocket与代理服务器通信。
+基于socks5转发http请求，并使用websocket与代理服务器通信。
 
 - websocket是一种浏览器与服务器进行全双工通讯的网络技术，属于应用层协议。它基于TCP传输协议，并复用HTTP的握手通道。
 
