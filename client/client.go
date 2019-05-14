@@ -83,7 +83,7 @@ func (client *Client) ListenAndServe() {
 func (client *Client) completeHostAndPort() {
 	host, port, err := net.SplitHostPort(client.config.RemoteAddr)
 	if err != nil {
-		log.Println("error remote address")
+		log.Fatal("error remote address, please use -r to specify remoteaddr")
 	}
 	client.host = host
 	client.port = port
