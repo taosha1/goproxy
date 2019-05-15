@@ -73,6 +73,29 @@ func (client *Client) ListenAndServe() {
 		t, err := client.CreateTunnel(target.Host, target.Port)
 		if err != nil {
 			log.Println(err)
+			/*
+			panic: runtime error: invalid memory address or nil pointer dereference
+			[signal 0xc0000005 code=0x0 addr=0x18 pc=0x48baf8]
+
+			goroutine 269 [running]:
+			io.copyBuffer(0x7449a0, 0xc000126000, 0x0, 0x0, 0xc00071a000, 0x8000, 0x8000, 0x0, 0x4084f3, 0x916d20)
+			        C:/Go/src/io/io.go:402 +0x108
+			io.Copy(...)
+			        C:/Go/src/io/io.go:364
+			net.genericReadFrom(...)
+			        C:/Go/src/net/net.go:614
+			net.(*TCPConn).readFrom(0xc000118118, 0x0, 0x0, 0xc0007a1ec0, 0x4097a1, 0x69fee0)
+			        C:/Go/src/net/tcpsock_posix.go:54 +0x103
+			net.(*TCPConn).ReadFrom(0xc000118118, 0x0, 0x0, 0xdc0068, 0xc000118118, 0x1)
+			        C:/Go/src/net/tcpsock.go:103 +0x55
+			io.copyBuffer(0x744280, 0xc000118118, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+			        C:/Go/src/io/io.go:388 +0x303
+			io.Copy(0x744280, 0xc000118118, 0x0, 0x0, 0x0, 0x744240, 0xc0000fc050)
+			        C:/Go/src/io/io.go:364 +0x61
+			created by github.com/taosha1/goproxy/client.(*Client).ListenAndServe.func1
+			        C:/Users/wang/Desktop/goproxy/client/client.go:78 +0x202
+			*/
+			return
 		}
 		go io.Copy(t,conn)
 		go io.Copy(conn,t)

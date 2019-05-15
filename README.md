@@ -44,4 +44,12 @@ help:
 ./client.exe -h
 ./server.exe -h
 ```
+## TO-DO
+```
+1.  docker
+2.  流量统计
+3.  日志
+4.  单元测试
+5.  ...
+```
 
