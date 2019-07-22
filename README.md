@@ -1,5 +1,8 @@
 # goproxy
-基于socks5转发http请求，并使用websocket与代理服务器通信。
+[![Build Status](https://travis-ci.com/taosha1/goproxy.svg?branch=master)](https://travis-ci.com/taosha1/goproxy)
+
+# Overview
+基于socks5转发网络请求，并使用websocket与代理服务器通信。
 
 - websocket是一种浏览器与服务器进行全双工通讯的网络技术，属于应用层协议。它基于TCP传输协议，并复用HTTP的握手通道。
 
@@ -46,7 +49,7 @@ help:
 ```
 ## TO-DO
 ```
-1.  docker
+1.  dockerfile
 2.  流量统计
 3.  日志
 4.  单元测试
