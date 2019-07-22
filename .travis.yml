@@ -1,0 +1,11 @@
+language: go
+go:
+- 1.x
+- "1.12"
+- "1.12.x"
+- master
+script:
+- go build -o client.exe goproxy-client/main.go
+- go build -o server.exe goproxy-server/main.go
+
+
